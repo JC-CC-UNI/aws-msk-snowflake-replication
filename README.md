@@ -80,6 +80,7 @@ This repository includes a **VS Code Dev Container** so the environment is fully
 
 ```bash
 aws sts get-caller-identity
+```
 
 flowchart LR
     subgraph VPC["AWS VPC (Private Subnets)"]
