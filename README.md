@@ -81,3 +81,46 @@ This repository includes a **VS Code Dev Container** so the environment is fully
 ```bash
 aws sts get-caller-identity
 
+flowchart LR
+    subgraph VPC["AWS VPC (Private Subnets)"]
+        direction LR
+
+        EC2Client["EC2 Client (Optional)\nKafka Tools / Testing"]
+
+        subgraph MSKCluster["Amazon MSK Cluster"]
+            Broker1["Broker 1"]
+            Broker2["Broker 2"]
+            Broker3["Broker 3"]
+        end
+
+        DMS["AWS DMS (Optional)\nCDC to Kafka"]
+
+    end
+
+    subgraph GlueETL["(Optional) AWS Glue Jobs"]
+        glue1["Data Enrichment / Transform"]
+    end
+
+    subgraph Snowflake["Snowflake"]
+        SFStage["Snowpipe Streaming"]
+        SFTables["Raw + Transformed Tables"]
+
+        subgraph dbt["dbt Core / dbt Cloud"]
+            dbtModels["dbt Models\nTransformations"]
+        end
+
+        Looker["Looker\nBI & Analytics"]
+    end
+
+    AppProducers["Producers\n(Apps, Microservices,\nLambda, IoT, etc.)"]
+
+    AppProducers -->|Produce messages| MSKCluster
+    EC2Client -->|Produce/Consume for testing| MSKCluster
+    DMS -->|CDC events| MSKCluster
+
+    MSKCluster -->|Kafka Connect\nSnowflake Sink Connector| SFStage
+    SFStage --> SFTables
+    SFTables --> dbtModels
+    dbtModels --> Looker
+
+    glue1 --> SFTables
