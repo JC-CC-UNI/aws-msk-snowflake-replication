@@ -82,46 +82,88 @@ This repository includes a **VS Code Dev Container** so the environment is fully
 aws sts get-caller-identity
 ```
 
-flowchart LR
-    subgraph VPC["AWS VPC (Private Subnets)"]
-        direction LR
+## 🔧 Configuration
 
-        EC2Client["EC2 Client (Optional)\nKafka Tools / Testing"]
+### AWS Credentials & Terraform Variable (Environment Variables)
+All variables are loaded from dev_msk.env using the TF_VAR_ prefix.
 
-        subgraph MSKCluster["Amazon MSK Cluster"]
-            Broker1["Broker 1"]
-            Broker2["Broker 2"]
-            Broker3["Broker 3"]
-        end
+Example:
+```bash
+export TF_VAR_region=us-east-1
+export TF_VAR_environment=dev
+export TF_VAR_vpc_id=vpc-05eb5ffe616347613
+...
+```
 
-        DMS["AWS DMS (Optional)\nCDC to Kafka"]
+Load them inside the dev container:
 
-    end
+```bash
+source dev_msk.env
+source .env
+```
+Verify:
 
-    subgraph GlueETL["(Optional) AWS Glue Jobs"]
-        glue1["Data Enrichment / Transform"]
-    end
+```bash
+echo $TF_VAR_region
+```
 
-    subgraph Snowflake["Snowflake"]
-        SFStage["Snowpipe Streaming"]
-        SFTables["Raw + Transformed Tables"]
 
-        subgraph dbt["dbt Core / dbt Cloud"]
-            dbtModels["dbt Models\nTransformations"]
-        end
+## ▶️ Deploying the MSK Cluster
 
-        Looker["Looker\nBI & Analytics"]
-    end
+Run the following inside the dev container:
 
-    AppProducers["Producers\n(Apps, Microservices,\nLambda, IoT, etc.)"]
+```bash
+cd msk/
+terraform init
+terraform plan
+terraform apply
+```
 
-    AppProducers -->|Produce messages| MSKCluster
-    EC2Client -->|Produce/Consume for testing| MSKCluster
-    DMS -->|CDC events| MSKCluster
+Terraform will:
 
-    MSKCluster -->|Kafka Connect\nSnowflake Sink Connector| SFStage
-    SFStage --> SFTables
-    SFTables --> dbtModels
-    dbtModels --> Looker
+Configure the backend in S3
 
-    glue1 --> SFTables
+Deploy the MSK cluster
+
+Provision security groups
+
+Launch the EC2 Kafka client
+
+Apply MSK server properties
+
+## 📤 Outputs
+
+After provisioning, Terraform prints:
+
+MSK cluster details
+
+MSK security group ID
+
+Private subnet IDs
+
+Example:
+
+```bash
+private_subnet_ids = [...]
+msk_security_group_id = "sg-xxxxx"
+msk_cluster = { ... }
+```
+
+## 📘 Notes
+
+- The EC2 instance automatically installs Kafka 3.2.0.
+
+- Client → broker traffic is PLAINTEXT (demo only, not production).
+
+- Update kafka_version to a specific number (e.g., 3.8.1) if required by AWS MSK.
+
+## 🗑 Destroying All Resources
+
+```bash
+terraform destroy
+```
+
+## 🙋‍♂️ Author
+
+JC Carhuarica
+Cloud & Data Engineer
