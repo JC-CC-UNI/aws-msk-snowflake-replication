@@ -35,6 +35,7 @@ Using Terraform, the project creates:
 
 ## 📁 Project Structure
 
+```
 aws-msk-snowflake-replication/
 ├── .devcontainer/
 │ ├── devcontainer.json # VS Code Dev Container setup
@@ -48,7 +49,7 @@ aws-msk-snowflake-replication/
 ├── dev_msk.env # TF_VAR_* environment variables
 └── .gitignore
 
-
+```
 
 ---
 
