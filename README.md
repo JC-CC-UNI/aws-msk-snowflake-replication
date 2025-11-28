@@ -121,25 +121,25 @@ terraform apply
 
 Terraform will:
 
-Configure the backend in S3
+- Configure the backend in S3
 
-Deploy the MSK cluster
+- Deploy the MSK cluster
 
-Provision security groups
+- Provision security groups
 
-Launch the EC2 Kafka client
+- Launch the EC2 Kafka client
 
-Apply MSK server properties
+- Apply MSK server properties
 
 ## 📤 Outputs
 
 After provisioning, Terraform prints:
 
-MSK cluster details
+- MSK cluster details
 
-MSK security group ID
+- MSK security group ID
 
-Private subnet IDs
+- Private subnet IDs
 
 Example:
 
